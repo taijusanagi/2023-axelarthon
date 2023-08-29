@@ -7,10 +7,17 @@ module.exports = {
   ],
   theme: {
     extend: {
-      backgroundImage: {
-        "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
-        "gradient-conic":
-          "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
+      backgroundColor: {
+        "galactic-blue": "#007BFF",
+        "stellar-gold": "#FFD700",
+        "deep-space": "#000000",
+        "lunar-white": "#F5F5F5",
+      },
+      textColor: {
+        "galactic-blue": "#007BFF",
+        "stellar-gold": "#FFD700",
+        "deep-space": "#000000",
+        "lunar-white": "#F5F5F5",
       },
     },
   },
