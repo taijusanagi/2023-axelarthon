@@ -1,5 +1,5 @@
 import { extendEnvironment } from "hardhat/config";
-import { OMNI_FACTORY_ADDRESS, axelarTestnetConfigs } from "../../configs";
+import { axelarTestnetConfigs } from "../../configs";
 import { DeterministicDeployer } from "@account-abstraction/sdk";
 import {
   Create2Deployer__factory,
@@ -49,51 +49,46 @@ extendEnvironment((hre) => {
     }
     console.log(">> salt", salt);
     const [signer] = await hre.ethers.getSigners();
-    const omniFactoryCode = await hre.ethers.provider.getCode(
-      OMNI_FACTORY_ADDRESS
+    console.log(">> signer", signer.address);
+    const deterministicDeployer = new DeterministicDeployer(
+      hre.ethers.provider,
+      signer
     );
-    if (omniFactoryCode === "0x") {
-      console.log(">> OmniFactory is not deployed yet, deploying...");
-      const deterministicDeployer = new DeterministicDeployer(
-        hre.ethers.provider,
-        signer
+    const axelar = axelarTestnetConfigs[sourceChainId];
+    const create2DeployerAddress =
+      await deterministicDeployer.deterministicDeploy(
+        Create2Deployer__factory.bytecode
       );
-      const axelar = axelarTestnetConfigs[sourceChainId];
-      const create2DeployerAddress =
-        await deterministicDeployer.deterministicDeploy(
-          Create2Deployer__factory.bytecode
-        );
-      const create2Deployer = Create2Deployer__factory.connect(
-        create2DeployerAddress,
-        signer
-      );
-      await create2Deployer.deployed();
+    const create2Deployer = Create2Deployer__factory.connect(
+      create2DeployerAddress,
+      signer
+    );
+    await create2Deployer.deployed();
 
-      const omniFactoryInterface = OmniFactory__factory.createInterface();
-      const init = omniFactoryInterface.encodeFunctionData("initialize", [
-        axelar.gatewayAddress,
-        axelar.gasServiceAddress,
-        create2DeployerAddress,
-      ]);
-      const salt = process.env.DEPLOYMENT_SALT || hre.ethers.constants.HashZero;
-      const omniFactoryAddress = await create2Deployer.deployedAddress(
-        OmniFactory__factory.bytecode,
-        signer.address,
-        salt
-      );
+    const omniFactoryInterface = OmniFactory__factory.createInterface();
+    const init = omniFactoryInterface.encodeFunctionData("initialize", [
+      axelar.gatewayAddress,
+      axelar.gasServiceAddress,
+      create2DeployerAddress,
+    ]);
+    const omniFactoryAddress = await create2Deployer.deployedAddress(
+      OmniFactory__factory.bytecode,
+      signer.address,
+      process.env.DEPLOYMENT_SALT || hre.ethers.constants.HashZero
+    );
+    console.log(">> omniFactoryAddress", omniFactoryAddress);
+    if ((await hre.ethers.provider.getCode(omniFactoryAddress)) === "0x") {
+      console.log(">> OmniFactory is not deployed yet, deploying...");
       const deployTx = await create2Deployer.deployAndInit(
         OmniFactory__factory.bytecode,
         salt,
         init
       );
       await deployTx.wait();
-      if (omniFactoryAddress !== OMNI_FACTORY_ADDRESS) {
-        throw new Error("omniFactoryAddress mismatch");
-      }
-      console.log(">> OmniFactory deployed at", omniFactoryAddress);
+      console.log(">> OmniFactory deployed");
     }
     const omniFactory = OmniFactory__factory.connect(
-      OMNI_FACTORY_ADDRESS,
+      omniFactoryAddress,
       signer
     );
     const Contract = await hre.ethers.getContractFactory(contractName);
@@ -107,7 +102,6 @@ extendEnvironment((hre) => {
       salt
     );
     console.log(">> expectedDeployedAddress", expectedDeployedAddress);
-
     if (gui) {
       console.log(">> gui mode enabled");
       console.log(">> service uri", "http://localhost:3000");
@@ -126,10 +120,11 @@ extendEnvironment((hre) => {
           destinationChain,
           creationCode,
           salt,
-          "0x"
+          "0x",
+          { value: hre.ethers.utils.parseEther("0.01") } // should use gas service in Prod
         );
         await tx.wait();
-        console.log(">> tx sent to Axelar Network");
+        console.log(">> tx sent to Axelar Network", tx.hash);
       }
     }
   };

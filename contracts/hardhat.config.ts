@@ -15,6 +15,7 @@ const config: HardhatUserConfig = {
       },
     },
     goerli: {
+      chainId: 5,
       url: "https://rpc.ankr.com/eth_goerli",
       accounts: [process.env.PRIVATE_KEY as string],
     },

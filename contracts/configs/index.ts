@@ -1,6 +1,3 @@
-export const OMNI_FACTORY_ADDRESS =
-  "0x78A4E27fAD290974c38f22F16AD0C399cA01c4d5";
-
 export const axelarTestnetConfigs = {
   5: {
     name: "ethereum-2",
