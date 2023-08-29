@@ -9,6 +9,7 @@ import {
 declare module "hardhat/types/runtime" {
   export interface HardhatRuntimeEnvironment {
     ommniDeploy: (
+      setup: boolean,
       gui: boolean,
       contractName: string,
       constractorArguments: any[],
@@ -20,6 +21,7 @@ declare module "hardhat/types/runtime" {
 
 extendEnvironment((hre) => {
   hre.ommniDeploy = async function (
+    setup: boolean,
     gui: boolean,
     contractName: string,
     constractorArguments: any[],
@@ -34,6 +36,8 @@ extendEnvironment((hre) => {
       throw new Error("Unsupported network");
     }
     console.log("=== OmmniDeploy with Axelar Network ===");
+    console.log(">> setup mode", setup);
+    console.log(">> gui mode", gui);
     console.log(">> contractName", contractName);
     console.log(">> constractorArguments", constractorArguments);
     const sourceChain = axelarTestnetConfigs[sourceChainId].name;
@@ -86,6 +90,9 @@ extendEnvironment((hre) => {
       );
       await deployTx.wait();
       console.log(">> OmniFactory deployed");
+    }
+    if (setup) {
+      return;
     }
     const omniFactory = OmniFactory__factory.connect(
       omniFactoryAddress,

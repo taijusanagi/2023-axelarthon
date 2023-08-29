@@ -24,7 +24,6 @@ const App: React.FC = () => {
 
   return (
     <div className="bg-deep-space text-lunar-white h-screen flex flex-col">
-      {/* Adjusted header opacity to match the main container */}
       <header className="sticky top-0 z-10 p-4 bg-deep-space bg-opacity-60">
         <div className="float-right">
           <button className="bg-galactic-blue text-lunar-white px-4 py-2 rounded hover:bg-stellar-gold">
@@ -38,7 +37,6 @@ const App: React.FC = () => {
         style={{ backgroundImage: 'url("background.jpg")' }}
       >
         <div className="p-8 bg-opacity-60 bg-deep-space rounded-lg space-y-4 max-w-2xl w-full">
-          {/* Hero Section */}
           <div className="text-center mb-4">
             <h1 className="text-4xl font-bold">OmniDeployer</h1>
           </div>
@@ -82,7 +80,6 @@ const App: React.FC = () => {
               </div>
             </label>
           </div>
-          {/* Adjusted the button to take up the full width */}
           <button
             className={`w-full bg-galactic-blue text-lunar-white py-2 rounded ${
               isDeployDisabled
@@ -98,13 +95,8 @@ const App: React.FC = () => {
       </main>
       {isModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center z-20">
-          {/* Modal Overlay */}
           <div className="absolute inset-0 bg-black opacity-75 z-10"></div>
-
-          {/* Modal Content */}
           <div className="bg-deep-space p-8 rounded-lg space-y-4 max-w-md w-full z-30">
-            {" "}
-            {/* Note the z-30 here */}
             <h2 className="text-2xl font-bold text-center">Modal Title</h2>
             <p>Your modal content here...</p>
             <button

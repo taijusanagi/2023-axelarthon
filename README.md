@@ -4,15 +4,15 @@
 
 ### Source chain Tx
 
-https://goerli.etherscan.io/tx/0x021aaba949502881a0160e2bee25533dcb390333779596f370ccb78981079158
+https://goerli.etherscan.io/tx/0xc6a1c9c8a1502203180b4d6d10cbabbd8615613aee7676647c6903d420b372b0
 
 ### Axelar Scan
 
-https://testnet.axelarscan.io/gmp/0x021aaba949502881a0160e2bee25533dcb390333779596f370ccb78981079158
+https://testnet.axelarscan.io/gmp/0xc6a1c9c8a1502203180b4d6d10cbabbd8615613aee7676647c6903d420b372b0
 
 ### Destination Chain Tx
 
-https://mumbai.polygonscan.com/tx/0xcc688c95d25f1ec51dde541dacb9aa07ba93d455c887d9a24a710113525bb6a8
+Coming soon!
 
 ### Destination Deployed Contract
 
