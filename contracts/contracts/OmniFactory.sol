@@ -5,32 +5,24 @@ import {AxelarExecutable} from "@axelar-network/axelar-gmp-sdk-solidity/contract
 import {IAxelarGasService} from "@axelar-network/axelar-gmp-sdk-solidity/contracts/interfaces/IAxelarGasService.sol";
 import {StringToAddress, AddressToString} from "@axelar-network/axelar-gmp-sdk-solidity/contracts/libs/AddressString.sol";
 
-import {Initializable} from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
-
-import {AxelarExecutableInitializable} from "./AxelarExecutableInitializable.sol";
 import {ICREATE3Factory} from "./ICREATE3Factory.sol";
 
-
-
 // OmniFactory should be deployed to the same address across all networks
-contract OmniFactory is Initializable, AxelarExecutableInitializable {
+contract OmniFactory is AxelarExecutable {
     IAxelarGasService public gasService;
     ICREATE3Factory public create3Factory;
 
     event Deployed(address indexed deployed);
 
-    // constructor is not used here to make OmniFactory address same across all networks
-    function initialize(
+    constructor (
         address _gateway,
         address _gasReceiver,
         address _create3Factory
-    ) public initializer {
-        AxelarExecutableInitializable.initialize(_gateway);
+    ) public AxelarExecutable(_gateway) {
         gasService = IAxelarGasService(_gasReceiver);
         create3Factory = ICREATE3Factory(_create3Factory);
     }
 
-    // It can have init code for the deployed contract is the contract uses proxy pattern, but it is not used in this demo
     function deploy(
         bytes32 salt,
         bytes memory creationCode
@@ -54,6 +46,20 @@ contract OmniFactory is Initializable, AxelarExecutableInitializable {
             msg.sender
         );
         gateway.callContract(destinationChain, destinationAddress, payload);
+    }
+
+    function omniDeployBatch(
+        string[] memory destinationChains,
+        bytes32[] memory salts,
+        bytes[] memory creationCodes
+    ) public payable {
+        require(
+            destinationChains.length == salts.length && salts.length == creationCodes.length,
+            "Invalid input"
+        );
+        for (uint256 i = 0; i < destinationChains.length; i++) {
+            omniDeploy(destinationChains[i], salts[i], creationCodes[i]);
+        }
     }
 
     function _execute(
