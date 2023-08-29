@@ -1,28 +1,136 @@
 import { extendEnvironment } from "hardhat/config";
-import { OMNI_FACTORY_ADDRESS } from "../../configs";
+import { OMNI_FACTORY_ADDRESS, axelarTestnetConfigs } from "../../configs";
+import { DeterministicDeployer } from "@account-abstraction/sdk";
+import {
+  Create2Deployer__factory,
+  OmniFactory__factory,
+} from "../../typechain-types";
 
 declare module "hardhat/types/runtime" {
   export interface HardhatRuntimeEnvironment {
-    ommniDeploy: (contractName: string, args: any[]) => Promise<void>;
+    ommniDeploy: (
+      gui: boolean,
+      contractName: string,
+      constractorArguments: any[],
+      destinationChain?: string,
+      salt?: string
+    ) => Promise<void>;
   }
 }
 
 extendEnvironment((hre) => {
-  hre.ommniDeploy = async function (contractName: string, args: any[]) {
-    console.log("ommniDeploy");
-    console.log("contractName", contractName);
-    console.log("args", args);
-
-    const code = await hre.ethers.provider.getCode(OMNI_FACTORY_ADDRESS);
-    if (code === "0x") {
+  hre.ommniDeploy = async function (
+    gui: boolean,
+    contractName: string,
+    constractorArguments: any[],
+    destinationChain?: string,
+    salt: string = hre.ethers.constants.HashZero
+  ) {
+    const sourceChainId = hre.network.config.chainId;
+    if (
+      !sourceChainId ||
+      (sourceChainId !== 5 && sourceChainId !== 97 && sourceChainId !== 80001)
+    ) {
+      throw new Error("Unsupported network");
     }
-
-    console.log("xDeploy called");
-    const Contract = await hre.ethers.getContractFactory(contractName);
-    const argument = hre.ethers.utils.defaultAbiCoder.encode(["address"], args);
-    const factoryDeploymentCode = hre.ethers.utils.solidityPack(
-      ["bytes", "bytes"],
-      [Contract.bytecode, argument]
+    console.log("=== OmmniDeploy with Axelar Network ===");
+    console.log(">> contractName", contractName);
+    console.log(">> constractorArguments", constractorArguments);
+    const sourceChain = axelarTestnetConfigs[sourceChainId].name;
+    console.log(">> sourceChain", sourceChain);
+    const isCrossChainDeployEnabled =
+      destinationChain && sourceChain !== destinationChain;
+    if (isCrossChainDeployEnabled) {
+      console.log(
+        ">> cross-chain deploy with Axelar is enabled",
+        destinationChain
+      );
+      console.log(">> destinationChain", destinationChain);
+    }
+    console.log(">> salt", salt);
+    const [signer] = await hre.ethers.getSigners();
+    const omniFactoryCode = await hre.ethers.provider.getCode(
+      OMNI_FACTORY_ADDRESS
     );
+    if (omniFactoryCode === "0x") {
+      console.log(">> OmniFactory is not deployed yet, deploying...");
+      const deterministicDeployer = new DeterministicDeployer(
+        hre.ethers.provider,
+        signer
+      );
+      const axelar = axelarTestnetConfigs[sourceChainId];
+      const create2DeployerAddress =
+        await deterministicDeployer.deterministicDeploy(
+          Create2Deployer__factory.bytecode
+        );
+      const create2Deployer = Create2Deployer__factory.connect(
+        create2DeployerAddress,
+        signer
+      );
+      await create2Deployer.deployed();
+
+      const omniFactoryInterface = OmniFactory__factory.createInterface();
+      const init = omniFactoryInterface.encodeFunctionData("initialize", [
+        axelar.gatewayAddress,
+        axelar.gasServiceAddress,
+        create2DeployerAddress,
+      ]);
+      const salt = process.env.DEPLOYMENT_SALT || hre.ethers.constants.HashZero;
+      const omniFactoryAddress = await create2Deployer.deployedAddress(
+        OmniFactory__factory.bytecode,
+        signer.address,
+        salt
+      );
+      const deployTx = await create2Deployer.deployAndInit(
+        OmniFactory__factory.bytecode,
+        salt,
+        init
+      );
+      await deployTx.wait();
+      if (omniFactoryAddress !== OMNI_FACTORY_ADDRESS) {
+        throw new Error("omniFactoryAddress mismatch");
+      }
+      console.log(">> OmniFactory deployed at", omniFactoryAddress);
+    }
+    const omniFactory = OmniFactory__factory.connect(
+      OMNI_FACTORY_ADDRESS,
+      signer
+    );
+    const Contract = await hre.ethers.getContractFactory(contractName);
+    const creationCode = hre.ethers.utils.solidityPack(
+      ["bytes", "bytes"],
+      [Contract.bytecode, Contract.interface.encodeDeploy(constractorArguments)]
+    );
+    const expectedDeployedAddress = await omniFactory.deployedAddress(
+      creationCode,
+      signer.address,
+      salt
+    );
+    console.log(">> expectedDeployedAddress", expectedDeployedAddress);
+
+    if (gui) {
+      console.log(">> gui mode enabled");
+      console.log(">> service uri", "http://localhost:3000");
+      console.log(">> creationCode", creationCode);
+    } else {
+      console.log(">> deploying...");
+      if (!isCrossChainDeployEnabled) {
+        const tx = await omniFactory.deploy(creationCode, salt, "0x");
+        await tx.wait();
+        const deployedCode = await hre.ethers.provider.getCode(
+          expectedDeployedAddress
+        );
+        console.log(">> deployed", deployedCode !== "0x");
+      } else {
+        const tx = await omniFactory.omniDeploy(
+          destinationChain,
+          creationCode,
+          salt,
+          "0x"
+        );
+        await tx.wait();
+        console.log(">> tx sent to Axelar Network");
+      }
+    }
   };
 });

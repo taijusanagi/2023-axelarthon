@@ -103,4 +103,18 @@ contract OmniFactory is Initializable, AxelarExecutableInitializable {
             .decode(payload_, (bytes, bytes32, bytes));
         deploy(creationCode, salt, init);
     }
+
+    function deployedAddress(
+        bytes memory creationCode,
+        address sender,
+        bytes32 salt
+    ) public view returns (address) {
+        bytes32 computedSalt = keccak256(abi.encodePacked(salt, sender));
+        return
+            create2Deployer.deployedAddress(
+                creationCode,
+                address(this),
+                computedSalt
+            );
+    }
 }

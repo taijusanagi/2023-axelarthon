@@ -1,8 +1,7 @@
 import { ommniDeploy } from "hardhat";
 
 async function main() {
-  const val = "val";
-  ommniDeploy("Sample", [val]);
+  ommniDeploy(false, "Sample", ["val"], "Polygon");
 }
 
 // We recommend this pattern to be able to use async/await everywhere

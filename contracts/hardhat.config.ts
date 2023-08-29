@@ -9,6 +9,7 @@ const config: HardhatUserConfig = {
   solidity: "0.8.18",
   networks: {
     hardhat: {
+      chainId: 5,
       forking: {
         url: "https://rpc.ankr.com/eth_goerli",
       },
