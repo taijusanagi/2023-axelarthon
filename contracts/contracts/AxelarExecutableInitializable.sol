@@ -9,11 +9,15 @@ import {Initializable} from "@openzeppelin/contracts-upgradeable/proxy/utils/Ini
 contract AxelarExecutableInitializable is IAxelarExecutable, Initializable {
     IAxelarGateway public gateway;
 
-    function __AxelarExecutable_init(address gateway_) internal onlyInitializing {
+    function __AxelarExecutable_init(
+        address gateway_
+    ) internal onlyInitializing {
         __AxelarExecutable_init_unchained(gateway_);
     }
 
-    function __AxelarExecutable_init_unchained(address gateway_) internal onlyInitializing {
+    function __AxelarExecutable_init_unchained(
+        address gateway_
+    ) internal onlyInitializing {
         if (gateway_ == address(0)) revert InvalidAddress();
         gateway = IAxelarGateway(gateway_);
     }

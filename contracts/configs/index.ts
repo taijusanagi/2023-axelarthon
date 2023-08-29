@@ -1,3 +1,6 @@
+export const OMNI_FACTORY_ADDRESS =
+  "0x47E7399575eB82B14B57B3E6Dc2A1d2b17Ac37fe";
+
 export const axelarConfigs = {
   goerli: {
     name: "ethereum-2",
