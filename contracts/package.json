@@ -3,11 +3,13 @@
   "scripts": {
     "build": "npx hardhat compile",
     "test": "npx hardhat test",
-    "format": "npx prettier --write . --ignore-path .gitignore"
+    "format": "npx prettier --write . --ignore-path .gitignore --plugin=prettier-plugin-solidity"
   },
   "devDependencies": {
+    "@axelar-network/axelar-gmp-sdk-solidity": "^5.1.1",
     "@nomicfoundation/hardhat-toolbox": "^2.0.2",
     "@openzeppelin/contracts": "^4.9.3",
+    "@openzeppelin/contracts-upgradeable": "^4.9.3",
     "hardhat": "^2.17.1",
     "prettier": "^3.0.2",
     "prettier-plugin-solidity": "^1.1.3"
