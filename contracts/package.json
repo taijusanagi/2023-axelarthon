@@ -6,6 +6,7 @@
     "format": "npx prettier --write . --ignore-path .gitignore --plugin=prettier-plugin-solidity"
   },
   "devDependencies": {
+    "@account-abstraction/sdk": "^0.6.0",
     "@axelar-network/axelar-gmp-sdk-solidity": "^5.1.1",
     "@nomicfoundation/hardhat-toolbox": "^2.0.2",
     "@openzeppelin/contracts": "^4.9.3",

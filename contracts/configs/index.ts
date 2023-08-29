@@ -1,8 +1,3 @@
-export const constants = {
-  // https://github.com/lifinance/create3-factory/tree/main
-  CREATE3FACTORY_ADDRESS: "0x93FEC2C00BfE902F733B57c5a6CeeD7CD1384AE1",
-};
-
 export const axelarConfigs = {
   goerli: {
     name: "ethereum-2",

@@ -1,43 +1,63 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import {AxelarExecutable} from "@axelar-network/axelar-gmp-sdk-solidity/contracts/executable/AxelarExecutable.sol";
 import {IAxelarGasService} from "@axelar-network/axelar-gmp-sdk-solidity/contracts/interfaces/IAxelarGasService.sol";
+import {Create2Deployer} from "@axelar-network/axelar-gmp-sdk-solidity/contracts/deploy/Create2Deployer.sol";
 import {StringToAddress, AddressToString} from "@axelar-network/axelar-gmp-sdk-solidity/contracts/libs/AddressString.sol";
+import {Initializable} from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
-import {ICREATE3Factory} from "./ICREATE3Factory.sol";
+import {AxelarExecutableInitializable} from "./AxelarExecutableInitializable.sol";
 
-// OmniFactory should be deployed to the same address across all networks
-contract OmniFactory is AxelarExecutable {
+contract OmniFactory is Initializable, AxelarExecutableInitializable {
     IAxelarGasService public gasService;
-    ICREATE3Factory public create3Factory;
+    Create2Deployer public create2Deployer;
 
-    event Deployed(address indexed deployed);
+    event Deployed(
+        address indexed deployed,
+        bytes creationCode,
+        bytes32 salt,
+        bytes init
+    );
 
-    constructor (
+    function initialize(
         address _gateway,
         address _gasReceiver,
-        address _create3Factory
-    ) public AxelarExecutable(_gateway) {
+        address _create2Deployer
+    ) public initializer {
+        __AxelarExecutable_init(_gateway);
         gasService = IAxelarGasService(_gasReceiver);
-        create3Factory = ICREATE3Factory(_create3Factory);
+        create2Deployer = Create2Deployer(_create2Deployer);
     }
 
     function deploy(
+        bytes memory creationCode,
         bytes32 salt,
-        bytes memory creationCode
+        bytes memory init
     ) public {
-        address deployed = create3Factory.deploy(salt, creationCode);
-        emit Deployed(deployed);
+        bytes32 computedSalt = keccak256(abi.encodePacked(salt, msg.sender));
+        address deployed;
+        if (init.length == 0) {
+            deployed = create2Deployer.deploy(creationCode, computedSalt);
+        } else {
+            deployed = create2Deployer.deployAndInit(
+                creationCode,
+                computedSalt,
+                init
+            );
+        }
+        emit Deployed(deployed, creationCode, computedSalt, init);
     }
 
     function omniDeploy(
         string memory destinationChain,
+        bytes memory creationCode,
         bytes32 salt,
-        bytes memory creationCode
+        bytes memory init
     ) public payable {
-        string memory destinationAddress = AddressToString.toString(address(this));
-        bytes memory payload = abi.encode(salt, creationCode);
+        string memory destinationAddress = AddressToString.toString(
+            address(this)
+        );
+        bytes memory payload = abi.encode(creationCode, salt, init);
         gasService.payNativeGasForContractCall{value: msg.value}(
             address(this),
             destinationChain,
@@ -50,15 +70,23 @@ contract OmniFactory is AxelarExecutable {
 
     function omniDeployBatch(
         string[] memory destinationChains,
+        bytes[] memory creationCodes,
         bytes32[] memory salts,
-        bytes[] memory creationCodes
+        bytes[] memory inits
     ) public payable {
         require(
-            destinationChains.length == salts.length && salts.length == creationCodes.length,
+            destinationChains.length == creationCodes.length &&
+                creationCodes.length == salts.length &&
+                salts.length == inits.length,
             "Invalid input"
         );
         for (uint256 i = 0; i < destinationChains.length; i++) {
-            omniDeploy(destinationChains[i], salts[i], creationCodes[i]);
+            omniDeploy(
+                destinationChains[i],
+                creationCodes[i],
+                salts[i],
+                inits[i]
+            );
         }
     }
 
@@ -67,11 +95,12 @@ contract OmniFactory is AxelarExecutable {
         string calldata sourceAddress_,
         bytes calldata payload_
     ) internal override {
-        // To ensure the source address is the same as the OmniFactory address
-        // This is possible because the OmniFactory address is the same across all networks and it has same bytecode
-        // We are not checking the sourceChain because it is not possible to fake the sourceChain in the current implementation
-        require(StringToAddress.toAddress(sourceAddress_) == address(this), "Invalid source address");  
-        (bytes32 salt, bytes memory creationCode) = abi.decode(payload_, (bytes32, bytes));
-        deploy(salt, creationCode);
+        require(
+            StringToAddress.toAddress(sourceAddress_) == address(this),
+            "Invalid source address"
+        );
+        (bytes memory creationCode, bytes32 salt, bytes memory init) = abi
+            .decode(payload_, (bytes, bytes32, bytes));
+        deploy(creationCode, salt, init);
     }
 }
