@@ -14,13 +14,13 @@ coming soon!
 
 ## Pitch Deck
 
-coming soon!
+https://docs.google.com/presentation/d/1PqYZM8NA531Z5NXosHvXOHENxFzQJbAtco8Hgf_1edE/edit?usp=sharing
 
 ## Problem Statement
 
 Deploying the same contract on multiple chains can be cumbersome. It requires specific configurations and necessitates the possession of native tokens to initiate transactions. Furthermore, maintaining a consistent address across multiple chains can be technically challenging and time-consuming.
 
-## Benefit
+## Solution
 
 OmniDeployer addresses these challenges head-on by introducing a streamlined Hardhat plugin and user interface:
 
