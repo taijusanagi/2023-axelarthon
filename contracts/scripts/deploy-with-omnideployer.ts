@@ -1,7 +1,7 @@
 import { ommniDeploy } from "hardhat";
 
 async function main() {
-  ommniDeploy(true, "Sample", ["This is test deployment."]);
+  ommniDeploy(true, "Sample", ["This is test deployment for Axelathon."]);
 }
 
 // We recommend this pattern to be able to use async/await everywhere
