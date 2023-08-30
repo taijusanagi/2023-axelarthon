@@ -1,8 +1,8 @@
-# OmmniDeployer
+# OmniDeployer
 
 ## Description
 
-OmniDeployer provides an omnichain deployer interface along with a Hardhat plugin to interact seamlessly with this interface. It leverages the power of Axelar's cross-chain messaging system to facilitate cross-chain deployment transactions.
+OmniDeployer provides an omnichain deployer interface along with a Hardhat plugin to interact seamlessly with this interface. It leverages the power of Axelar's cross-chain messaging.
 
 ## Live App
 
@@ -96,3 +96,10 @@ https://testnet.axelarscan.io/gmp/0x4c93ab37865167f9e75a3415c355ff72622266b96d4b
 #### Deployed Contract
 
 https://testnet.bscscan.com/address/0x63C88c55DACf288543bEdF85BEccBF65790dc32C
+
+## Roadmap
+
+- Support more network with Axelar Network
+- Publish frontend UI and hardhat plugin
+- Writing blog post to promote Omnichain Deployer
+- Finding more plugin opportunity in cross-chain ecosystem
