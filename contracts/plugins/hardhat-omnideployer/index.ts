@@ -44,6 +44,7 @@ extendEnvironment((hre) => {
     console.log(">> constractorArguments", constractorArguments);
     const sourceChain = axelarTestnetConfigs[sourceChainId].name;
     console.log(">> sourceChain", sourceChain);
+
     const isCrossChainDeployEnabled =
       destinationChain && sourceChain !== destinationChain;
     if (isCrossChainDeployEnabled) {

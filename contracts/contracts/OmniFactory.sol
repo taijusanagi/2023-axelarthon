@@ -12,13 +12,6 @@ contract OmniFactory is Initializable, AxelarExecutableInitializable {
     IAxelarGasService public gasService;
     Create2Deployer public create2Deployer;
 
-    event Deployed(
-        address indexed deployed,
-        bytes creationCode,
-        bytes32 salt,
-        bytes init
-    );
-
     function initialize(
         address _gateway,
         address _gasReceiver,
@@ -35,18 +28,26 @@ contract OmniFactory is Initializable, AxelarExecutableInitializable {
         bytes memory init
     ) public {
         bytes32 computedSalt = keccak256(abi.encodePacked(salt, msg.sender));
+        _deploy(creationCode, computedSalt, init);
+    }
+
+    function _deploy(
+        bytes memory creationCode,
+        bytes32 salt,
+        bytes memory init
+    ) internal {
         address deployed;
         if (init.length == 0) {
-            deployed = create2Deployer.deploy(creationCode, computedSalt);
+            deployed = create2Deployer.deploy(creationCode, salt);
         } else {
             deployed = create2Deployer.deployAndInit(
                 creationCode,
-                computedSalt,
+                salt,
                 init
             );
         }
-        emit Deployed(deployed, creationCode, computedSalt, init);
     }
+
 
     function _omniDeploy(
         string memory destinationChain,
@@ -58,7 +59,8 @@ contract OmniFactory is Initializable, AxelarExecutableInitializable {
         string memory destinationAddress = AddressToString.toString(
             address(this)
         );
-        bytes memory payload = abi.encode(creationCode, salt, init);
+        bytes32 computedSalt = keccak256(abi.encodePacked(salt, msg.sender));
+        bytes memory payload = abi.encode(creationCode, computedSalt, init);
         gasService.payNativeGasForContractCall{value: value}(
             address(this),
             destinationChain,
@@ -121,7 +123,7 @@ contract OmniFactory is Initializable, AxelarExecutableInitializable {
         );
         (bytes memory creationCode, bytes32 salt, bytes memory init) = abi
             .decode(payload_, (bytes, bytes32, bytes));
-        deploy(creationCode, salt, init);
+        _deploy(creationCode, salt, init);
     }
 
     function deployedAddress(

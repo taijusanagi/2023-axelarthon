@@ -38,19 +38,16 @@ export const axelarTestnetConfigs = {
     gasServiceAddress: "0xbE406F0189A0B4cf3A05C286473D23791Dd44Cc6",
   },
   421613: {
-    isDeployed: true,
     name: "arbitrum",
     gatewayAddress: "0xe432150cce91c13a887f7D836923d5597adD8E31",
     gasServiceAddress: "0xbE406F0189A0B4cf3A05C286473D23791Dd44Cc6",
   },
   420: {
-    isDeployed: true,
     name: "optimism",
     gatewayAddress: "0xe432150cce91c13a887f7D836923d5597adD8E31",
     gasServiceAddress: "0xbE406F0189A0B4cf3A05C286473D23791Dd44Cc6",
   },
   84531: {
-    isDeployed: true,
     name: "base",
     gatewayAddress: "0xe432150cce91c13a887f7D836923d5597adD8E31",
     gasServiceAddress: "0xbE406F0189A0B4cf3A05C286473D23791Dd44Cc6",
