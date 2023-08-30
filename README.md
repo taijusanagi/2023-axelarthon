@@ -10,7 +10,7 @@ https://omni-deployer.vercel.app/
 
 ## Demo Video
 
-https://youtu.be/rxUMHu3ZBOE
+https://youtu.be/QvE1cv-mqm0
 
 ## Pitch Deck
 
