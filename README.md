@@ -79,7 +79,7 @@ async function main() {
 
 ### Multiple Omni Deployment Tx
 
-#### Transaction Hash
+#### Source Chain Transaction Hash
 
 https://goerli.etherscan.io/tx/0x4c93ab37865167f9e75a3415c355ff72622266b96d4b65e26f81c0c186e4859e
 
@@ -88,6 +88,8 @@ https://goerli.etherscan.io/tx/0x4c93ab37865167f9e75a3415c355ff72622266b96d4b65e
 - One transaction sends multiple Axelar cross-chain messages
 
 ![omni-deployment](./docs/omni-deployment.png)
+
+#### Cross Chain Tx Detail
 
 https://testnet.axelarscan.io/gmp/0x4c93ab37865167f9e75a3415c355ff72622266b96d4b65e26f81c0c186e4859e:38
 
