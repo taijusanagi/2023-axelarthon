@@ -26,15 +26,19 @@ At its core, OmniDeployer operates by having the same address deployed to all ch
 
 ![how-it-works](./docs/how-it-works.png)
 
-## Multiple Omni Deployment
-
-![omni-deployment](./docs/omni-deployment.png)
+## Multiple Omni Deployment Tx
 
 ### Transaction Hash
 
 https://goerli.etherscan.io/tx/0x57c110d365f196a50483f93b602e67434990928c3635bdbf34435f113beea4f3
 
-## Single Omni Deployment
+### Axelar Scan
+
+- One transaction sends multiple Axelar cross-chain messages
+
+![omni-deployment](./docs/omni-deployment.png)
+
+## Single Omni Deployment for Tx Detail
 
 ### Source chain Tx
 
