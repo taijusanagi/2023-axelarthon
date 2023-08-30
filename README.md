@@ -1,6 +1,40 @@
-# Hardhat OmmniDeployer Plugin
+# OmmniDeployer
 
-## Reference
+## Description
+
+OmniDeployer provides an omnichain deployer interface along with a Hardhat plugin to interact seamlessly with this interface. It leverages the power of Axelar's cross-chain messaging system to facilitate cross-chain deployment transactions.
+
+![screen](./docs/screen.png)
+
+## Problem Statement
+
+Deploying the same contract on multiple chains can be cumbersome. It requires specific configurations and necessitates the possession of native tokens to initiate transactions. Furthermore, maintaining a consistent address across multiple chains can be technically challenging and time-consuming.
+
+## Benefit
+
+OmniDeployer addresses these challenges head-on by introducing a streamlined Hardhat plugin and user interface:
+
+- Users can easily input contract details into the plugin.
+- The UI lets users select their desired network.
+- With a single transaction, all deployments are executed, courtesy of Axelar's cross-chain messaging.
+
+This drastically enhances the efficiency of multi-chain smart contract deployment, making the entire process seamless and user-friendly.
+
+## Technical Details
+
+At its core, OmniDeployer operates by having the same address deployed to all chains. This address, referred to as OmnichainDeployer, is intricately connected with AxelarExecutable. As a result, OmniDeployer can initiate deployment transactions across all chains from a singular chain, exemplifying the power and utility of Axelar's cross-chain capabilities.
+
+![how-it-works](./docs/how-it-works.png)
+
+## Multiple Omni Deployment
+
+![omni-deployment](./docs/omni-deployment.png)
+
+### Transaction Hash
+
+https://goerli.etherscan.io/tx/0x57c110d365f196a50483f93b602e67434990928c3635bdbf34435f113beea4f3
+
+## Single Omni Deployment
 
 ### Source chain Tx
 
