@@ -4,11 +4,9 @@
 
 OmniDeployer provides an omnichain deployer interface along with a Hardhat plugin to interact seamlessly with this interface. It leverages the power of Axelar's cross-chain messaging system to facilitate cross-chain deployment transactions.
 
-![screen](./docs/screen.png)
-
 ## Live App
 
-coming soon!
+https://omni-deployer.vercel.app/
 
 ## Demo Video
 
@@ -75,32 +73,36 @@ async function main() {
 >> salt 0x00000000000000000000000000...
 ```
 
-## Multiple Omni Deployment Tx
+#### Interact with Frontend
 
-### Transaction Hash
+![screen](./docs/screen.png)
+
+### Multiple Omni Deployment Tx
+
+#### Transaction Hash
 
 https://goerli.etherscan.io/tx/0x57c110d365f196a50483f93b602e67434990928c3635bdbf34435f113beea4f3
 
-### Axelar Scan
+#### Axelar Scan
 
 - One transaction sends multiple Axelar cross-chain messages
 
 ![omni-deployment](./docs/omni-deployment.png)
 
-## Single Omni Deployment for Tx Detail
+### Single Omni Deployment for Tx Detail
 
-### Source chain Tx
+#### Source chain Tx
 
 https://goerli.etherscan.io/tx/0xc6a1c9c8a1502203180b4d6d10cbabbd8615613aee7676647c6903d420b372b0
 
-### Axelar Scan
+#### Axelar Scan
 
 https://testnet.axelarscan.io/gmp/0xc6a1c9c8a1502203180b4d6d10cbabbd8615613aee7676647c6903d420b372b0
 
-### Destination Chain Tx
+#### Destination Chain Tx
 
 https://mumbai.polygonscan.com/tx/0xfcd9c1adeccee5f918bc55c04f2a73b3ecc08a27ee0362ad8c5d0af0105f7dca
 
-### Destination Deployed Contract
+#### Destination Deployed Contract
 
 https://mumbai.polygonscan.com/address/0xe3f3db12355db5d8094fc1f77fe56b96536bc758
