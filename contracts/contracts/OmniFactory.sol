@@ -48,17 +48,18 @@ contract OmniFactory is Initializable, AxelarExecutableInitializable {
         emit Deployed(deployed, creationCode, computedSalt, init);
     }
 
-    function omniDeploy(
+    function _omniDeploy(
         string memory destinationChain,
         bytes memory creationCode,
         bytes32 salt,
-        bytes memory init
+        bytes memory init,
+        uint256 value
     ) public payable {
         string memory destinationAddress = AddressToString.toString(
             address(this)
         );
         bytes memory payload = abi.encode(creationCode, salt, init);
-        gasService.payNativeGasForContractCall{value: msg.value}(
+        gasService.payNativeGasForContractCall{value: value}(
             address(this),
             destinationChain,
             destinationAddress,
@@ -68,24 +69,43 @@ contract OmniFactory is Initializable, AxelarExecutableInitializable {
         gateway.callContract(destinationChain, destinationAddress, payload);
     }
 
+    function omniDeploy(
+        string memory destinationChain,
+        bytes memory creationCode,
+        bytes32 salt,
+        bytes memory init,
+        uint256 value
+    ) public payable {
+        require(value == msg.value, "Invalid value");
+        _omniDeploy(destinationChain, creationCode, salt, init, value);
+    }
+
     function omniDeployBatch(
         string[] memory destinationChains,
         bytes[] memory creationCodes,
         bytes32[] memory salts,
-        bytes[] memory inits
+        bytes[] memory inits,
+        uint256[] memory values
     ) public payable {
         require(
             destinationChains.length == creationCodes.length &&
                 creationCodes.length == salts.length &&
-                salts.length == inits.length,
+                salts.length == inits.length &&
+                inits.length == values.length,
             "Invalid input"
         );
+        uint256 totalValue;
+        for (uint256 i = 0; i < values.length; i++) {
+            totalValue += values[i];
+        }
+        require(totalValue == msg.value, "Invalid value");
         for (uint256 i = 0; i < destinationChains.length; i++) {
-            omniDeploy(
+            _omniDeploy(
                 destinationChains[i],
                 creationCodes[i],
                 salts[i],
-                inits[i]
+                inits[i],
+                values[i]
             );
         }
     }

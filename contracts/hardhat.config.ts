@@ -29,6 +29,21 @@ const config: HardhatUserConfig = {
       url: "https://data-seed-prebsc-1-s1.binance.org:8545",
       accounts: [process.env.PRIVATE_KEY as string],
     },
+    optimismGoerli: {
+      chainId: 420,
+      url: "https://endpoints.omniatech.io/v1/op/goerli/public",
+      accounts: [process.env.PRIVATE_KEY as string],
+    },
+    baseGoerli: {
+      chainId: 84531,
+      url: "https://goerli.base.org",
+      accounts: [process.env.PRIVATE_KEY as string],
+    },
+    arbitrumGoerli: {
+      chainId: 421613,
+      url: "https://endpoints.omniatech.io/v1/arbitrum/goerli/public",
+      accounts: [process.env.PRIVATE_KEY as string],
+    },
   },
 };
 

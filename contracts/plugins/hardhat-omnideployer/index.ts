@@ -2,6 +2,7 @@ import { extendEnvironment } from "hardhat/config";
 import { axelarTestnetConfigs } from "../../configs";
 import { DeterministicDeployer } from "@account-abstraction/sdk";
 import {
+  Create2Deployer,
   Create2Deployer__factory,
   OmniFactory__factory,
 } from "../../typechain-types";
@@ -9,7 +10,6 @@ import {
 declare module "hardhat/types/runtime" {
   export interface HardhatRuntimeEnvironment {
     ommniDeploy: (
-      setup: boolean,
       gui: boolean,
       contractName: string,
       constractorArguments: any[],
@@ -21,7 +21,6 @@ declare module "hardhat/types/runtime" {
 
 extendEnvironment((hre) => {
   hre.ommniDeploy = async function (
-    setup: boolean,
     gui: boolean,
     contractName: string,
     constractorArguments: any[],
@@ -31,12 +30,15 @@ extendEnvironment((hre) => {
     const sourceChainId = hre.network.config.chainId;
     if (
       !sourceChainId ||
-      (sourceChainId !== 5 && sourceChainId !== 97 && sourceChainId !== 80001)
+      (sourceChainId !== 5 &&
+        sourceChainId !== 97 &&
+        sourceChainId !== 80001 &&
+        sourceChainId !== 420 &&
+        sourceChainId !== 421613)
     ) {
       throw new Error("Unsupported network");
     }
     console.log("=== OmmniDeploy with Axelar Network ===");
-    console.log(">> setup mode", setup);
     console.log(">> gui mode", gui);
     console.log(">> contractName", contractName);
     console.log(">> constractorArguments", constractorArguments);
@@ -63,12 +65,22 @@ extendEnvironment((hre) => {
       await deterministicDeployer.deterministicDeploy(
         Create2Deployer__factory.bytecode
       );
-    const create2Deployer = Create2Deployer__factory.connect(
-      create2DeployerAddress,
-      signer
-    );
-    await create2Deployer.deployed();
-
+    const create2Deployer: Create2Deployer = await new Promise((resolve) => {
+      const checkCreate2DeployerIntervalId = setInterval(async () => {
+        try {
+          const create2Deployer = Create2Deployer__factory.connect(
+            create2DeployerAddress,
+            signer
+          );
+          const deployed = await create2Deployer.deployed();
+          clearInterval(checkCreate2DeployerIntervalId);
+          return resolve(deployed);
+        } catch (e) {
+          console.log(">> waiting for Create2Deployer to be deployed...");
+        }
+      }, 1000);
+    });
+    console.log(">> create2DeployerAddress", create2DeployerAddress);
     const omniFactoryInterface = OmniFactory__factory.createInterface();
     const init = omniFactoryInterface.encodeFunctionData("initialize", [
       axelar.gatewayAddress,
@@ -91,9 +103,6 @@ extendEnvironment((hre) => {
       await deployTx.wait();
       console.log(">> OmniFactory deployed");
     }
-    if (setup) {
-      return;
-    }
     const omniFactory = OmniFactory__factory.connect(
       omniFactoryAddress,
       signer
@@ -113,6 +122,7 @@ extendEnvironment((hre) => {
       console.log(">> gui mode enabled");
       console.log(">> service uri", "http://localhost:3000");
       console.log(">> creationCode", creationCode);
+      console.log(">> salt", salt);
     } else {
       console.log(">> deploying...");
       if (!isCrossChainDeployEnabled) {
@@ -123,12 +133,14 @@ extendEnvironment((hre) => {
         );
         console.log(">> deployed", deployedCode !== "0x");
       } else {
+        const value = hre.ethers.utils.parseEther("0.01"); // should use gas service in Prod
         const tx = await omniFactory.omniDeploy(
           destinationChain,
           creationCode,
           salt,
           "0x",
-          { value: hre.ethers.utils.parseEther("0.01") } // should use gas service in Prod
+          value,
+          { value }
         );
         await tx.wait();
         console.log(">> tx sent to Axelar Network", tx.hash);
