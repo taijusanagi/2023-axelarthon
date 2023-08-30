@@ -120,7 +120,7 @@ extendEnvironment((hre) => {
     console.log(">> expectedDeployedAddress", expectedDeployedAddress);
     if (gui) {
       console.log(">> gui mode enabled");
-      console.log(">> service uri", "http://localhost:3000");
+      console.log(">> service uri", "https://omni-deployer.vercel.app/");
       console.log(">> creationCode", creationCode);
       console.log(">> salt", salt);
     } else {

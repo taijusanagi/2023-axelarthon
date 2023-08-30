@@ -6,6 +6,18 @@ OmniDeployer provides an omnichain deployer interface along with a Hardhat plugi
 
 ![screen](./docs/screen.png)
 
+## Live App
+
+coming soon!
+
+## Demo Video
+
+coming soon!
+
+## Pitch Deck
+
+coming soon!
+
 ## Problem Statement
 
 Deploying the same contract on multiple chains can be cumbersome. It requires specific configurations and necessitates the possession of native tokens to initiate transactions. Furthermore, maintaining a consistent address across multiple chains can be technically challenging and time-consuming.
@@ -25,6 +37,43 @@ This drastically enhances the efficiency of multi-chain smart contract deploymen
 At its core, OmniDeployer operates by having the same address deployed to all chains. This address, referred to as OmnichainDeployer, is intricately connected with AxelarExecutable. As a result, OmniDeployer can initiate deployment transactions across all chains from a singular chain, exemplifying the power and utility of Axelar's cross-chain capabilities.
 
 ![how-it-works](./docs/how-it-works.png)
+
+### Plugin Usage
+
+#### Hardhat config
+
+```
+import "./plugins/hardhat-omnideployer";
+```
+
+#### Script
+
+```
+import { ommniDeploy } from "hardhat";
+
+async function main() {
+  ommniDeploy(true, "Sample", ["test"]);
+}
+```
+
+#### Expected Result
+
+```
+=== OmmniDeploy with Axelar Network ===
+>> gui mode true
+>> contractName Sample
+>> constractorArguments [ 'test' ]
+>> sourceChain ethereum-2
+>> salt 0x00000000000000000000000000...
+>> signer 0x00000c9b10039702e0587E587623f6a6786e4F7B
+>> create2DeployerAddress 0x29ccc23fe0c0dce6b929f4f8d81607ad66a48cde
+>> omniFactoryAddress 0xe20Cc7d5DD900301A7989c7A6775315AF99f73fe
+>> expectedDeployedAddress 0x951f95039D2Bca4dcFc054fb2abb83b7b303D742
+>> gui mode enabled
+>> service uri https://omni-deployer.vercel.app/ // this is path to UI
+>> creationCode 0x608060405234801561...
+>> salt 0x00000000000000000000000000...
+```
 
 ## Multiple Omni Deployment Tx
 
